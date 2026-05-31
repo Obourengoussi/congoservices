@@ -91,11 +91,6 @@ http://localhost:5000
 
 ### 🔑 Comptes de test
 
-| Rôle | Email | Mot de passe |
-|------|-------|--------------|
-| Admin | admin@congobrazza.cg | admin123 |
-| Test | test@congobrazza.cg | test123 |
-
 ---
 
 ## 📦 Structure du projet
@@ -232,8 +227,8 @@ Ce projet est sous licence MIT.
 
 ## 📞 Contact
 
-- **Email** : contact@congobrazza.cg
-- **WhatsApp** : +242 06 123 45 67
+- **Email** : ibaracrepin2@gmail.com
+- **WhatsApp** : +242 06 507 21 14
 - **Adresse** : Brazzaville, Congo
 
 ---
