@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 from config import Config
 from models import db, User, Prestataire, Video, Comment, Payment, Contact, VideoLike
 import os
+def init_db():
+    if os.environ.get("RENDER"):
+        return
 import uuid
 
 # ============================================
@@ -854,9 +857,6 @@ def init_db():
 # POINT D'ENTRÉE
 # ============================================
 if __name__ == '__main__':
-    # Initialiser la base de données
     init_db()
-    
-    # Lancer le serveur
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=5000)
 
