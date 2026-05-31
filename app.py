@@ -25,7 +25,11 @@ app.config.from_object(Config)
 csrf = CSRFProtect(app)
 
 # DB
+# DB
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 # Login manager
 login_manager = LoginManager()
