@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}
+Contact - CongoServices
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+
+    <div class="container py-5">
+
+        <div class="row">
+
+            <div class="col-lg-8 mx-auto">
+
+                <!-- Titre -->
+                <h1 class="text-center mb-4">
+                    Contactez-nous
+                </h1>
+
+                <!-- Message info -->
+                <div class="alert alert-primary border-0 shadow-sm">
+                    <i class="bi bi-info-circle me-2"></i>
+
+                    Notre équipe vous répondra
+                    dans les meilleurs délais.
+                </div>
+
+                <!-- FORMULAIRE -->
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-body">
+
+                        <form method="POST" autocomplete="off">
+
+                            <!-- 🔒 CSRF -->
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+                            <!-- Nom -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="name"
+                                    class="form-label"
+                                >
+                                    Nom
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="name"
+                                    name="name"
+                                    maxlength="100"
+                                    required
+                                >
+
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="email"
+                                    class="form-label"
+                                >
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    maxlength="120"
+                                    required
+                                >
+
+                            </div>
+
+                            <!-- Sujet -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="subject"
+                                    class="form-label"
+                                >
+                                    Sujet
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="subject"
+                                    name="subject"
+                                >
+
+                                    <option value="general">
+                                        Question générale
+                                    </option>
+
+                                    <option value="support">
+                                        Support technique
+                                    </option>
+
+                                    <option value="partnership">
+                                        Partenariat
+                                    </option>
+
+                                    <option value="other">
+                                        Autre
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- Message -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="message"
+                                    class="form-label"
+                                >
+                                    Message
+                                </label>
+
+                                <textarea
+                                    class="form-control"
+                                    id="message"
+                                    name="message"
+                                    rows="5"
+                                    maxlength="2000"
+                                    required
+                                ></textarea>
+
+                            </div>
+
+                            <!-- Bouton -->
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+
+                                <i class="bi bi-send me-2"></i>
+                                Envoyer
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- AUTRES CONTACTS -->
+                <div class="card border-0 shadow-sm mt-4">
+
+                    <div class="card-body">
+
+                        <h5>
+                            Autres moyens de nous contacter
+                        </h5>
+
+                        <ul class="list-unstyled">
+
+                            <li class="mb-2">
+
+                                <i class="bi bi-envelope me-2"></i>
+
+                                <a
+                                    href="mailto:contact@congobrazza.cg"
+                                >
+                                    contact@congobrazza.cg
+                                </a>
+
+                            </li>
+
+                            <li class="mb-2">
+
+                                <i class="bi bi-telephone me-2"></i>
+
+                                <a
+                                    href="tel:+242061234567"
+                                >
+                                    +242 06 123 45 67
+                                </a>
+
+                            </li>
+
+                            <li class="mb-2">
+
+                                <i class="bi bi-whatsapp me-2"></i>
+
+                                <a
+                                    href="https://wa.me/242061234567"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    +242 06 123 45 67
+                                </a>
+
+                            </li>
+
+                            <li>
+
+                                <i class="bi bi-geo-alt me-2"></i>
+                                Brazzaville, Congo
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

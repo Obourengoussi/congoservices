@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}{{ prestataire.get_full_name()|e }} - {{ prestataire.service|e }} - CongoServices{% endblock %}
+
+{% block content %}
+<div class="profil-page">
+
+    <div class="container py-4">
+
+        <!-- En-tête du profil -->
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Avatar -->
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+
+                        {% if prestataire.photo %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/profiles/' + prestataire.photo) }}"
+                            alt="{{ prestataire.nom|e }}"
+                            class="rounded-circle profile-avatar">
+
+                        {% else %}
+
+                        <div class="profile-avatar-large rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto">
+                            <span class="display-4">
+                                {{ prestataire.nom[0]|e }}
+                            </span>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Infos -->
+                    <div class="col-md-6">
+
+                        <div class="mb-2">
+
+                            {% if prestataire.is_premium %}
+                            <span class="badge bg-warning text-dark me-1">
+                                <i class="bi bi-star-fill me-1"></i>Premium
+                            </span>
+                            {% endif %}
+
+                            {% if prestataire.is_boosted %}
+                            <span class="badge bg-info text-white me-1">
+                                <i class="bi bi-lightning-fill me-1"></i>En tête
+                            </span>
+                            {% endif %}
+
+                            {% if not prestataire.is_validated %}
+                            <span class="badge bg-secondary">
+                                En attente de validation
+                            </span>
+                            {% endif %}
+
+                        </div>
+
+                        <h2 class="mb-1">
+                            {{ prestataire.get_full_name()|e }}
+                        </h2>
+
+                        <p class="text-muted mb-2">
+
+                            {% if prestataire.entreprise %}
+                            <i class="bi bi-building me-1"></i>
+                            {{ prestataire.entreprise|e }}
+                            <br>
+                            {% endif %}
+
+                            <span class="badge bg-primary">
+                                {{ prestataire.service|e }}
+                            </span>
+
+                        </p>
+
+                        <!-- Description sécurisée -->
+                        <p class="mb-3">
+                            {{ prestataire.description|e }}
+                        </p>
+
+                        <!-- Localisation -->
+                        <div class="row text-muted small">
+
+                            <div class="col-6">
+                                <i class="bi bi-geo-alt me-1"></i>
+
+                                {{ prestataire.ville|e }}
+
+                                {% if prestataire.quartier %}
+                                    , {{ prestataire.quartier|e }}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-6">
+                                <i class="bi bi-calendar me-1"></i>
+                                Membre depuis {{ prestataire.created_at.strftime('%B %Y') }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="col-md-3 text-md-end">
+
+                        <!-- WhatsApp -->
+                        {% if prestataire.whatsapp %}
+                        <a href="{{ prestataire.get_whatsapp_link() }}"
+                           class="btn btn-success btn-lg w-100 mb-2"
+                           target="_blank"
+                           rel="noopener noreferrer">
+
+                            <i class="bi bi-whatsapp me-2"></i>
+                            Contacter sur WhatsApp
+
+                        </a>
+                        {% endif %}
+
+                        <!-- Téléphone -->
+                        {% if prestataire.telephone %}
+                        <a href="tel:{{ prestataire.telephone|e }}"
+                           class="btn btn-outline-primary btn-lg w-100 mb-2">
+
+                            <i class="bi bi-telephone me-2"></i>
+                            {{ prestataire.telephone|e }}
+
+                        </a>
+                        {% endif %}
+
+                        <!-- Save -->
+                        {% if current_user.is_authenticated and current_user.id != prestataire.user_id %}
+
+                        <button class="btn btn-outline-secondary w-100"
+                                onclick="saveContact('{{ prestataire.id }}')">
+
+                            <i class="bi bi-bookmark me-2"></i>
+                            Enregistrer
+
+                        </button>
+
+                        {% endif %}
+
+                        <!-- Partage -->
+                        <div class="mt-3">
+
+                            <p class="small text-muted mb-2">
+                                Partager ce profil:
+                            </p>
+
+                            <a href="https://wa.me/?text=Je vous recommande {{ prestataire.get_full_name()|e }} sur CongoServices: {{ request.url }}"
+                               class="btn btn-outline-success btn-sm"
+                               target="_blank"
+                               rel="noopener noreferrer">
+
+                                <i class="bi bi-whatsapp"></i>
+
+                            </a>
+
+                            <button class="btn btn-outline-primary btn-sm"
+                                    onclick="copyLink()">
+
+                                <i class="bi bi-link-45deg"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Stats -->
+                <div class="row mt-4 pt-4 border-top text-center">
+
+                    <div class="col-4">
+                        <h4 class="mb-0 text-primary">
+                            <i class="bi bi-eye me-1"></i>
+                            {{ prestataire.views }}
+                        </h4>
+                        <small class="text-muted">Vues</small>
+                    </div>
+
+                    <div class="col-4">
+                        <h4 class="mb-0 text-primary">
+                            <i class="bi bi-heart me-1"></i>
+                            {{ prestataire.likes }}
+                        </h4>
+                        <small class="text-muted">J'aime</small>
+                    </div>
+
+                    <div class="col-4">
+                        <h4 class="mb-0 text-primary">
+                            <i class="bi bi-people me-1"></i>
+                            {{ prestataire.contacts }}
+                        </h4>
+                        <small class="text-muted">Contacts</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Vidéos -->
+        {% if videos %}
+
+        <div class="mb-4">
+
+            <h4 class="mb-3">
+                <i class="bi bi-play-circle me-2"></i>
+                Vidéos de présentation
+            </h4>
+
+            <div class="row g-3">
+
+                {% for video in videos %}
+
+                <div class="col-md-4">
+
+                    <a href="{{ url_for('voir_video', id=video.id) }}"
+                       class="text-decoration-none">
+
+                        <div class="video-card card border-0 shadow-sm">
+
+                            <div class="position-relative">
+
+                                <video class="w-100" muted loop preload="metadata">
+
+                                    <source
+                                        src="{{ url_for('static', filename='uploads/videos/' + video.video_file) }}"
+                                        type="video/mp4">
+
+                                </video>
+
+                                <div class="video-overlay">
+
+                                    <span class="badge bg-dark">
+                                        <i class="bi bi-play-fill me-1"></i>
+                                        {{ video.views }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="card-body py-2">
+
+                                <p class="card-title mb-0 text-dark text-truncate">
+                                    {{ video.title|e }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <!-- Similaires -->
+        <div class="mb-4">
+
+            <h4 class="mb-3">
+                Prestataires similaires
+            </h4>
+
+            <div class="row g-3">
+
+                {% for similar in [] %}
+                <div class="col-md-4">
+                    <!-- Similaires -->
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JS sécurisé -->
+<script>
+
+function saveContact(prestataireId) {
+
+    fetch(`/prestataire/${prestataireId}/contact`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'type=save'
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.success) {
+            alert('Prestataire enregistré !');
+        } else {
+            alert('Erreur.');
+        }
+
+    })
+    .catch(() => {
+        alert('Erreur réseau.');
+    });
+
+}
+
+function copyLink() {
+
+    navigator.clipboard.writeText(window.location.href)
+    .then(() => {
+        alert('Lien copié !');
+    })
+    .catch(() => {
+        alert('Impossible de copier le lien.');
+    });
+
+}
+
+</script>
+
+{% endblock %}

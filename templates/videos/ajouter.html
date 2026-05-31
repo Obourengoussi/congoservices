@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une vidéo - CongoServices{% endblock %}
+
+{% block content %}
+<div class="ajout-video-page">
+    <div class="container py-4">
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="card border-0 shadow-lg">
+
+                    <!-- Header -->
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="bi bi-camera-video me-2"></i>
+                            Ajouter une vidéo
+                        </h4>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <!-- FORM -->
+                        <form method="POST"
+                              enctype="multipart/form-data"
+                              autocomplete="off">
+
+                            <!-- CSRF -->
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <!-- Titre -->
+                            <div class="mb-3">
+
+                                <label for="title" class="form-label">
+                                    Titre de la vidéo *
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="title"
+                                       name="title"
+                                       placeholder="Présentez votre service en quelques mots"
+                                       minlength="5"
+                                       maxlength="120"
+                                       required>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+
+                                <label for="description" class="form-label">
+                                    Description
+                                </label>
+
+                                <textarea class="form-control"
+                                          id="description"
+                                          name="description"
+                                          rows="3"
+                                          maxlength="1000"
+                                          placeholder="Décrivez votre vidéo, vos services..."></textarea>
+                            </div>
+
+                            <!-- Catégorie -->
+                            <div class="mb-3">
+
+                                <label for="categorie" class="form-label">
+                                    Catégorie *
+                                </label>
+
+                                <select class="form-select"
+                                        id="categorie"
+                                        name="categorie"
+                                        required>
+
+                                    <option value="">
+                                        Sélectionner...
+                                    </option>
+
+                                    {% for cat_id, cat_name in categories %}
+                                    <option value="{{ cat_id }}">
+                                        {{ cat_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="mb-3">
+
+                                <label for="tags" class="form-label">
+                                    Tags
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="tags"
+                                       name="tags"
+                                       maxlength="250"
+                                       placeholder="plomberie, brazzaville, rapide">
+                            </div>
+
+                            <!-- Vidéo -->
+                            <div class="mb-3">
+
+                                <label for="video" class="form-label">
+                                    Fichier vidéo *
+                                </label>
+
+                                <input type="file"
+                                       class="form-control"
+                                       id="video"
+                                       name="video"
+                                       accept="video/mp4,video/webm,video/ogg"
+                                       required>
+
+                                <div class="form-text">
+                                    Formats acceptés :
+                                    MP4, WebM, OGG.
+                                    Taille maximale : 100MB.
+                                    <br>
+                                    Utilisez une vidéo verticale pour un meilleur rendu mobile.
+                                </div>
+                            </div>
+
+                            <!-- Miniature -->
+                            <div class="mb-4">
+
+                                <label for="thumbnail" class="form-label">
+                                    Miniature (optionnel)
+                                </label>
+
+                                <input type="file"
+                                       class="form-control"
+                                       id="thumbnail"
+                                       name="thumbnail"
+                                       accept="image/jpeg,image/png,image/webp">
+
+                                <div class="form-text">
+                                    Laissez vide pour utiliser une capture automatique.
+                                </div>
+                            </div>
+
+                            <!-- Aperçu -->
+                            <div class="mb-4">
+
+                                <div class="preview-container p-4 bg-light rounded text-center d-none"
+                                     id="previewContainer">
+
+                                    <video id="videoPreview"
+                                           class="w-100 rounded"
+                                           controls
+                                           preload="metadata"
+                                           style="max-height: 350px;">
+                                    </video>
+
+                                    <p class="mt-2 text-muted small"
+                                       id="videoName">
+                                    </p>
+
+                                </div>
+                            </div>
+
+                            <!-- Boutons -->
+                            <div class="d-grid gap-2">
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-lg">
+                                    <i class="bi bi-upload me-2"></i>
+                                    Télécharger la vidéo
+                                </button>
+
+                                <a href="{{ url_for('liste_videos') }}"
+                                   class="btn btn-outline-secondary">
+                                    Annuler
+                                </a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Conseils -->
+                <div class="card border-0 shadow-sm mt-4 bg-light">
+
+                    <div class="card-body">
+
+                        <h5>
+                            <i class="bi bi-lightbulb text-warning me-2"></i>
+                            Conseils pour une bonne vidéo
+                        </h5>
+
+                        <ul class="mb-0">
+                            <li>Gardez votre vidéo courte (15 à 60 secondes)</li>
+                            <li>Filmez à la verticale pour mobile</li>
+                            <li>Utilisez une bonne luminosité</li>
+                            <li>Présentez clairement vos services</li>
+                            <li>Ajoutez vos coordonnées à la fin</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const videoInput = document.getElementById('video');
+
+    if (videoInput) {
+
+        videoInput.addEventListener('change', function (e) {
+
+            const file = e.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const allowedTypes = [
+                'video/mp4',
+                'video/webm',
+                'video/ogg'
+            ];
+
+            const maxSize = 100 * 1024 * 1024;
+
+            // Vérification type
+            if (!allowedTypes.includes(file.type)) {
+
+                alert('Format vidéo non autorisé.');
+
+                e.target.value = '';
+
+                return;
+            }
+
+            // Vérification taille
+            if (file.size > maxSize) {
+
+                alert('La vidéo dépasse 100MB.');
+
+                e.target.value = '';
+
+                return;
+            }
+
+            const video = document.getElementById('videoPreview');
+            const container = document.getElementById('previewContainer');
+            const nameDisplay = document.getElementById('videoName');
+
+            // Nettoyage ancienne preview
+            if (video.src) {
+                URL.revokeObjectURL(video.src);
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+
+            video.src = objectUrl;
+
+            container.classList.remove('d-none');
+
+            nameDisplay.textContent =
+                `${file.name} • ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+        });
+    }
+});
+</script>
+
+{% endblock %}

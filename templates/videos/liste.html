@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Vidéos - CongoServices{% endblock %}
+
+{% block content %}
+<div class="videos-page">
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-play-circle-fill text-danger me-2"></i>
+                    Vidéos des prestataires
+                </h2>
+                <p class="text-muted mb-0">
+                    Découvrez les services en vidéo
+                </p>
+            </div>
+
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('ajouter_video') }}" class="btn btn-danger">
+                <i class="bi bi-camera-video me-2"></i>Ajouter une vidéo
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- FILTRES -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('liste_videos') }}">
+                    <div class="row g-3 align-items-end">
+
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">
+                                Catégorie
+                            </label>
+
+                            <select class="form-select" name="categorie">
+                                <option value="">
+                                    Toutes les catégories
+                                </option>
+
+                                {% for cat_id, cat_name in categories %}
+                                <option value="{{ cat_id }}"
+                                    {% if selected_categorie == cat_id %}selected{% endif %}>
+                                    {{ cat_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-2"></i>
+                                Filtrer
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIDEOS -->
+        {% if videos %}
+        <div class="row g-4">
+
+            {% for video in videos %}
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+
+                <a href="{{ url_for('voir_video', id=video.id) }}"
+                   class="text-decoration-none">
+
+                    <div class="video-card shadow-sm">
+
+                        <!-- VIDEO -->
+                        <div class="video-container">
+
+                            <video
+                                preload="metadata"
+                                muted
+                                playsinline
+                                poster="{{ video.get_thumbnail_url() if video.get_thumbnail_url() else '' }}"
+                            >
+                                <source
+                                    src="{{ url_for('static', filename='uploads/videos/' + video.video_file) }}"
+                                    type="video/mp4"
+                                >
+                            </video>
+
+                            <!-- PLAY -->
+                            <div class="play-button">
+                                <i class="bi bi-play-fill"></i>
+                            </div>
+
+                            <!-- OVERLAY -->
+                            <div class="video-overlay">
+
+                                <div class="video-stats">
+                                    <span>
+                                        <i class="bi bi-heart-fill me-1"></i>
+                                        {{ video.likes or 0 }}
+                                    </span>
+
+                                    <span>
+                                        <i class="bi bi-eye-fill me-1"></i>
+                                        {{ video.views or 0 }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <!-- BADGES -->
+                            <div class="video-badges">
+
+                                {% if video.is_sponsored %}
+                                <span class="badge bg-danger">
+                                    Sponsorisé
+                                </span>
+                                {% endif %}
+
+                                {% if video.is_featured %}
+                                <span class="badge bg-warning text-dark">
+                                    Vedette
+                                </span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- INFOS -->
+                        <div class="pt-2">
+
+                            <h6 class="video-title text-dark mb-1">
+                                {{ video.title }}
+                            </h6>
+
+                            {% if video.prestataire %}
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ video.prestataire.get_full_name() }}
+                            </p>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY -->
+        <div class="text-center py-5">
+
+            <i class="bi bi-camera-video display-1 text-muted"></i>
+
+            <h4 class="mt-3">
+                Aucune vidéo disponible
+            </h4>
+
+            <p class="text-muted">
+                Soyez le premier à publier une vidéo.
+            </p>
+
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('ajouter_video') }}"
+               class="btn btn-danger">
+                Ajouter une vidéo
+            </a>
+            {% else %}
+            <a href="{{ url_for('register') }}"
+               class="btn btn-primary">
+                Créer un compte
+            </a>
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+        <!-- PAGINATION -->
+        {% if pagination and pagination.pages > 1 %}
+        <nav class="mt-5">
+
+            <ul class="pagination justify-content-center">
+
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('liste_videos',
+                                        page=pagination.prev_num,
+                                        categorie=selected_categorie) }}">
+                        Précédent
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+
+                    {% if page_num %}
+                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                        <a class="page-link"
+                           href="{{ url_for('liste_videos',
+                                            page=page_num,
+                                            categorie=selected_categorie) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('liste_videos',
+                                        page=pagination.next_num,
+                                        categorie=selected_categorie) }}">
+                        Suivant
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+
+        </nav>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.video-card {
+    transition: 0.3s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+}
+
+.video-container {
+    position: relative;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #000;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    background: linear-gradient(
+        transparent,
+        rgba(0,0,0,0.85)
+    );
+}
+
+.video-stats {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(4px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    font-size: 2rem;
+
+    transition: 0.3s ease;
+}
+
+.video-card:hover .play-button {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.video-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.video-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pagination .page-link {
+    border-radius: 10px;
+    margin: 0 3px;
+}
+
+</style>
+{% endblock %}

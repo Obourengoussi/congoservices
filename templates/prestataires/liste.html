@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Prestataires - CongoServices{% endblock %}
+
+{% block content %}
+<div class="prestataires-page">
+    <div class="container py-4">
+        
+        <!-- Filtres -->
+        <div class="filters-card card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('liste_prestataires') }}" class="row g-3">
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Catégorie</label>
+                        <select class="form-select" name="categorie">
+                            <option value="">Toutes les catégories</option>
+
+                            {% for cat_id, cat_name in categories %}
+                            <option value="{{ cat_id }}"
+                                {% if selected_categorie == cat_id %}selected{% endif %}>
+                                {{ cat_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Ville</label>
+                        <select class="form-select" name="ville">
+                            <option value="">Toutes les villes</option>
+
+                            {% for city_id, city_name in cities %}
+                            <option value="{{ city_id }}"
+                                {% if selected_ville == city_id %}selected{% endif %}>
+                                {{ city_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-filter me-2"></i>Filtrer
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Résultats -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">
+                {% if selected_categorie or selected_ville or search %}
+                    {{ prestataires|length }} prestataires trouvés
+                {% else %}
+                    Tous les prestataires
+                {% endif %}
+            </h4>
+
+            <a href="{{ url_for('ajouter_prestataire') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un prestataire
+            </a>
+        </div>
+
+        {% if prestataires %}
+
+        <div class="row g-4">
+
+            {% for presta in prestataires %}
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card prestaire-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+
+                        <!-- Header -->
+                        <div class="d-flex align-items-start mb-3">
+
+                            <div class="prestaire-avatar me-3">
+
+                                {% if presta.photo %}
+                                <img
+                                    src="{{ url_for('static', filename='uploads/profiles/' + presta.photo) }}"
+                                    alt="{{ presta.nom }}"
+                                    class="rounded-circle">
+                                {% else %}
+                                <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                                    {{ presta.nom[0] }}
+                                </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div class="flex-grow-1">
+
+                                <h5 class="card-title mb-1">
+                                    {{ presta.get_full_name() }}
+                                </h5>
+
+                                <span class="badge bg-primary">
+                                    {{ presta.service }}
+                                </span>
+
+                                {% if presta.is_premium %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-star-fill me-1"></i>Premium
+                                </span>
+                                {% endif %}
+
+                                {% if presta.is_boosted %}
+                                <span class="badge bg-info text-white">
+                                    <i class="bi bi-lightning-fill me-1"></i>Boosté
+                                </span>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                        <!-- Description sécurisée -->
+                        <p class="card-text text-muted small">
+                            {{ presta.description[:100]|e if presta.description else 'Pas de description' }}...
+                        </p>
+
+                        <!-- Localisation -->
+                        <div class="d-flex align-items-center text-muted small mb-3">
+                            <i class="bi bi-geo-alt me-1"></i>
+
+                            {{ presta.ville }}
+                            {% if presta.quartier %}
+                                , {{ presta.quartier }}
+                            {% endif %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2">
+
+                            <a href="{{ url_for('profil_prestataire', id=presta.id) }}"
+                               class="btn btn-outline-primary btn-sm flex-grow-1">
+                                <i class="bi bi-eye me-1"></i>Voir profil
+                            </a>
+
+                            {% if presta.whatsapp %}
+                            <a href="{{ presta.get_whatsapp_link() }}"
+                               class="btn btn-success btn-sm"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if presta.telephone %}
+                            <a href="tel:{{ presta.telephone }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-telephone"></i>
+                            </a>
+                            {% endif %}
+
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="mt-3 pt-3 border-top">
+
+                            <div class="row text-center small text-muted">
+
+                                <div class="col-4">
+                                    <i class="bi bi-eye me-1"></i>
+                                    {{ presta.views }}
+                                </div>
+
+                                <div class="col-4">
+                                    <i class="bi bi-heart me-1"></i>
+                                    {{ presta.likes }}
+                                </div>
+
+                                <div class="col-4">
+                                    <i class="bi bi-people me-1"></i>
+                                    {{ presta.contacts }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('liste_prestataires',
+                                        page=pagination.prev_num,
+                                        categorie=selected_categorie,
+                                        ville=selected_ville) }}">
+                        Précédent
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+
+                    {% if page_num %}
+                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                        <a class="page-link"
+                           href="{{ url_for('liste_prestataires',
+                                            page=page_num,
+                                            categorie=selected_categorie,
+                                            ville=selected_ville) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('liste_prestataires',
+                                        page=pagination.next_num,
+                                        categorie=selected_categorie,
+                                        ville=selected_ville) }}">
+                        Suivant
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+        {% endif %}
+
+        {% else %}
+
+        <!-- Aucun résultat -->
+        <div class="text-center py-5">
+
+            <i class="bi bi-search display-1 text-muted"></i>
+
+            <h4 class="mt-3">
+                Aucun prestataire trouvé
+            </h4>
+
+            <p class="text-muted">
+                Essayez avec d'autres critères de recherche
+            </p>
+
+            <a href="{{ url_for('liste_prestataires') }}"
+               class="btn btn-primary">
+                Voir tous les prestataires
+            </a>
+
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

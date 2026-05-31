@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un prestataire - CongoServices{% endblock %}
+
+{% block content %}
+<div class="ajout-prestataire-page">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Ajouter mon service
+                        </h4>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <!-- FORMULAIRE -->
+                        <form method="POST"
+                              enctype="multipart/form-data"
+                              autocomplete="off">
+
+                            <!-- CSRF -->
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <!-- Infos personnelles -->
+                            <h5 class="mb-3">Informations personnelles</h5>
+
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-md-6">
+                                    <label for="nom" class="form-label">Nom *</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="nom"
+                                           name="nom"
+                                           maxlength="100"
+                                           required
+                                           autocomplete="off">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="prenom" class="form-label">Prénom</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="prenom"
+                                           name="prenom"
+                                           maxlength="100"
+                                           autocomplete="off">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+
+                                    <input type="email"
+                                           class="form-control"
+                                           id="email"
+                                           name="email"
+                                           maxlength="120"
+                                           autocomplete="off">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="entreprise" class="form-label">
+                                        Nom de l'entreprise
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="entreprise"
+                                           name="entreprise"
+                                           maxlength="200"
+                                           autocomplete="off">
+                                </div>
+
+                            </div>
+
+                            <!-- Service -->
+                            <h5 class="mb-3">Informations du service</h5>
+
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-md-6">
+                                    <label for="service" class="form-label">
+                                        Service proposé *
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="service"
+                                           name="service"
+                                           maxlength="100"
+                                           required
+                                           autocomplete="off"
+                                           placeholder="Ex: Réparation téléphone">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="categorie" class="form-label">
+                                        Catégorie *
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="categorie"
+                                            name="categorie"
+                                            required>
+
+                                        <option value="">Sélectionner...</option>
+
+                                        {% for cat_id, cat_name in categories %}
+                                        <option value="{{ cat_id }}">
+                                            {{ cat_name }}
+                                        </option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="description" class="form-label">
+                                        Description
+                                    </label>
+
+                                    <textarea class="form-control"
+                                              id="description"
+                                              name="description"
+                                              rows="4"
+                                              maxlength="1000"
+                                              placeholder="Décrivez votre activité..."></textarea>
+                                </div>
+
+                            </div>
+
+                            <!-- Localisation -->
+                            <h5 class="mb-3">Localisation</h5>
+
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-md-6">
+                                    <label for="ville" class="form-label">
+                                        Ville *
+                                    </label>
+
+                                    <select class="form-select"
+                                            id="ville"
+                                            name="ville"
+                                            required>
+
+                                        <option value="">Sélectionner...</option>
+
+                                        {% for city_id, city_name in cities %}
+                                        <option value="{{ city_id }}">
+                                            {{ city_name }}
+                                        </option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="quartier" class="form-label">
+                                        Quartier
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="quartier"
+                                           name="quartier"
+                                           maxlength="100"
+                                           autocomplete="off">
+                                           
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="adresse" class="form-label">
+                                        Adresse détaillée
+                                    </label>
+
+                                    <textarea class="form-control"
+                                              id="adresse"
+                                              name="adresse"
+                                              rows="2"
+                                              maxlength="300"></textarea>
+                                </div>
+
+                            </div>
+
+                            <!-- Contact -->
+                            <h5 class="mb-3">Coordonnées</h5>
+
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-md-6">
+                                    <label for="telephone" class="form-label">
+                                        Téléphone *
+                                    </label>
+
+                                    <input type="tel"
+                                           class="form-control"
+                                           id="telephone"
+                                           name="telephone"
+                                           maxlength="20"
+                                           required
+                                           autocomplete="off">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="whatsapp" class="form-label">
+                                        WhatsApp
+                                    </label>
+
+                                    <input type="tel"
+                                           class="form-control"
+                                           id="whatsapp"
+                                           name="whatsapp"
+                                           maxlength="20"
+                                           autocomplete="off">
+                                </div>
+
+                            </div>
+
+                            <!-- Upload image -->
+                            <h5 class="mb-3">Photo de profil</h5>
+
+                            <div class="mb-4">
+
+                                <label for="photo" class="form-label">
+                                    Photo
+                                </label>
+
+                                <input type="file"
+                                       class="form-control"
+                                       id="photo"
+                                       name="photo"
+                                       accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+
+                                <div class="form-text">
+                                    JPG / PNG uniquement — Max 5MB
+                                </div>
+
+                            </div>
+
+                            <!-- Alerte -->
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Votre profil sera examiné par un administrateur.
+                            </div>
+
+                            <!-- Boutons -->
+                            <div class="d-grid gap-2">
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-lg">
+
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Soumettre ma demande
+                                </button>
+
+                                <a href="{{ url_for('index') }}"
+                                   class="btn btn-outline-secondary">
+
+                                    Annuler
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Protection JS -->
+<script>
+
+document.getElementById('photo').addEventListener('change', function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    // Taille max 5MB
+    if (file.size > 5 * 1024 * 1024) {
+
+        alert("Image trop volumineuse (max 5MB).");
+        this.value = "";
+        return;
+    }
+
+    // Types autorisés
+    const allowed = [
+        'image/jpeg',
+        'image/png'
+    ];
+
+    if (!allowed.includes(file.type)) {
+
+        alert("Format non autorisé.");
+        this.value = "";
+    }
+});
+
+</script>
+
+{% endblock %}

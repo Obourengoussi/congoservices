@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block title %}CongoServices - Trouvez les meilleurs prestataires au Congo Brazzaville{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero-section text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+               <h1 class="fw-bold mb-3">
+                    Trouvez le meilleur
+                    <span class="highlight">prestataire</span>
+                    près de chez vous
+                </h1>
+
+                <p class="lead mb-4">
+                    CongoServices connecte les clients avec les meilleurs professionnels 
+                    au Congo Brazzaville. Plombiers, électriciens, mécaniciens, artisans...
+                    Trouvez celui qu'il vous faut en quelques clics!
+                </p>
+
+                <!-- Recherche principale -->
+                <form action="{{ url_for('liste_prestataires') }}" method="GET" class="search-box bg-white p-3 rounded-4 shadow">
+                    <div class="row g-2">
+
+                        <div class="col-md-5">
+                            <input 
+                                type="text"
+                                class="form-control border-0"
+                                name="search"
+                                placeholder="Quel service recherchez-vous?"
+                                maxlength="100"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="col-md-4">
+                            <select class="form-select border-0" name="ville">
+                                <option value="">Toutes les villes</option>
+
+                                {% for city_id, city_name in cities %}
+                                <option value="{{ city_id|e }}">
+                                    {{ city_name|e }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search me-2"></i>Rechercher
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div class="mt-4">
+                    <span class="me-3">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>100% Gratuit
+                    </span>
+
+                    <span class="me-3">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>Vérifiés
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>Disponibles
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row text-center">
+
+            <div class="col-6 col-md-3 mb-3">
+                <h2 class="fw-bold text-primary">500+</h2>
+                <p class="text-muted mb-0">Prestataires</p>
+            </div>
+
+            <div class="col-6 col-md-3 mb-3">
+                <h2 class="fw-bold text-primary">14</h2>
+                <p class="text-muted mb-0">Catégories</p>
+            </div>
+
+            <div class="col-6 col-md-3 mb-3">
+                <h2 class="fw-bold text-primary">7</h2>
+                <p class="text-muted mb-0">Villes</p>
+            </div>
+
+            <div class="col-6 col-md-3 mb-3">
+                <h2 class="fw-bold text-primary">1000+</h2>
+                <p class="text-muted mb-0">Clients satisfaits</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- CATÉGORIES -->
+<section class="py-5">
+    <div class="container">
+
+        <h2 class="text-center mb-4">
+            <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+            Catégories de services
+        </h2>
+
+        <div class="row g-3">
+
+            {% for cat_id, cat_name, icon in [
+                ('plomberie', 'Plomberie', 'bi-droplet-fill'),
+                ('electricite', 'Électricité', 'bi-lightning-charge-fill'),
+                ('menuiserie', 'Menuiserie', 'bi-tools'),
+                ('mecanique', 'Mécanique', 'bi-car-front-fill'),
+                ('informatique', 'Informatique', 'bi-laptop'),
+                ('telephone', 'Réparation téléphone', 'bi-phone-fill'),
+                ('coiffure', 'Coiffure', 'bi-scissors'),
+                ('peinture', 'Peinture', 'bi-palette-fill'),
+                ('cuisine', 'Traiteur', 'bi-cup-hot-fill'),
+                ('menage', 'Ménage', 'bi-house-heart-fill'),
+                ('transport', 'Transport', 'bi-truck'),
+                ('jardinage', 'Jardinage', 'bi-flower1')
+            ] %}
+
+            <div class="col-6 col-md-4 col-lg-3">
+
+                <a href="{{ url_for('liste_prestataires', categorie=cat_id) }}" class="text-decoration-none">
+
+                    <div class="category-card card h-100 border-0 shadow-sm">
+
+                        <div class="card-body text-center py-4">
+
+                            <i class="bi {{ icon|e }} display-6 text-primary mb-3"></i>
+
+                            <h5 class="card-title mb-0 text-dark">
+                                {{ cat_name|e }}
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('liste_prestataires') }}" class="btn btn-outline-primary">
+                Voir toutes les catégories
+                <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- PRESTATAIRES EN VEDETTE -->
+{% if featured_prestataires %}
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <h2 class="text-center mb-4">
+            <i class="bi bi-star-fill text-warning me-2"></i>
+            Prestataires vedettes
+        </h2>
+
+        <div class="row g-4">
+
+            {% for presta in featured_prestataires %}
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card prestaire-card h-100 border-0 shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="d-flex align-items-start mb-3">
+
+                            <div class="prestaire-avatar me-3">
+
+                                {% if presta.photo %}
+
+                                <img 
+                                    loading="lazy"
+                                    src="{{ url_for('static', filename='uploads/profiles/' + presta.photo) }}"
+                                    alt="{{ presta.nom|e }}"
+                                    class="rounded-circle">
+
+                                {% else %}
+
+                                <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center">
+                                    {{ presta.nom[0]|e if presta.nom else '?' }}
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div>
+
+                                <h5 class="card-title mb-1">
+                                    {{ presta.get_full_name()|e }}
+                                </h5>
+
+                                <span class="badge bg-primary">
+                                    {{ presta.service|e }}
+                                </span>
+
+                                {% if presta.is_premium %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-star-fill me-1"></i>Premium
+                                </span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <p class="card-text text-muted small">
+                            {{ presta.description[:100]|e if presta.description else 'Aucune description' }}...
+                        </p>
+
+                        <div class="d-flex align-items-center text-muted small mb-3">
+                            <i class="bi bi-geo-alt me-1"></i>
+
+                            {{ presta.ville|e }}
+
+                            {% if presta.quartier %}
+                                , {{ presta.quartier|e }}
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+
+                            <a href="{{ url_for('profil_prestataire', id=presta.id) }}"
+                               class="btn btn-outline-primary btn-sm flex-grow-1">
+
+                                <i class="bi bi-eye me-1"></i>Voir profil
+                            </a>
+
+                            {% if presta.whatsapp %}
+
+                            <a href="{{ presta.get_whatsapp_link()|e }}"
+                               class="btn btn-success btn-sm"
+                               target="_blank"
+                               rel="noopener noreferrer">
+
+                                <i class="bi bi-whatsapp"></i>
+
+                            </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+{% endif %}
+
+<!-- VIDÉOS -->
+{% if latest_videos %}
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h2 class="mb-0">
+                <i class="bi bi-play-circle-fill text-danger me-2"></i>
+                Vidéos découverte
+            </h2>
+
+            <a href="{{ url_for('liste_videos') }}" class="btn btn-outline-primary btn-sm">
+                Voir tout
+                <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+
+        </div>
+
+        <div class="row g-3">
+
+            {% for video in latest_videos[:6] %}
+
+            <div class="col-md-4 col-lg-2">
+
+                <a href="{{ url_for('voir_video', id=video.id) }}"
+                   class="text-decoration-none">
+
+                    <div class="video-thumbnail-card position-relative rounded overflow-hidden">
+
+                        <video
+                            class="w-100"
+                            muted
+                            loop
+                            playsinline
+                            preload="metadata"
+                            onmouseover="this.play()"
+                            onmouseout="this.pause()">
+
+                            <source src="{{ url_for('static', filename='uploads/videos/' + video.video_file) }}"
+                                    type="video/mp4">
+
+                        </video>
+
+                        <div class="video-overlay">
+
+                            <div class="video-stats">
+
+                                <span>
+                                    <i class="bi bi-heart-fill me-1"></i>{{ video.likes }}
+                                </span>
+
+                                <span>
+                                    <i class="bi bi-eye-fill me-1"></i>{{ video.views }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        {% if video.is_sponsored %}
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                            Sponsorisé
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+                    <p class="mt-2 text-dark small fw-medium text-truncate">
+                        {{ video.title|e }}
+                    </p>
+
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+{% endif %}
+
+
+<!-- COMMENT ÇA MARCHE -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <h2 class="text-center mb-5">Comment ça marche?</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-icon mx-auto mb-3">
+                    <i class="bi bi-search fs-2"></i>
+                </div>
+                <h4>1. Recherchez</h4>
+                <p>Parcourez les prestataires par catégorie ou recherchez un service spécifique.</p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="step-icon mx-auto mb-3">
+                    <i class="bi bi-person-check fs-2"></i>
+                </div>
+                <h4>2. Comparez</h4>
+                <p>Consultez les profils, avis et vidéos des prestataires près de chez vous.</p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="step-icon mx-auto mb-3">
+                    <i class="bi bi-whatsapp fs-2"></i>
+                </div>
+                <h4>3. Contactez</h4>
+                <p>Contactez directement le prestataire par WhatsApp ou téléphone.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA - DEVENIR PRESTATAIRE -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2>Vous êtes prestataire?</h2>
+                <p class="lead mb-0">
+                    Gagnez en visibilité et attirez de nouveaux clients!
+                    Créez votre profil gratuitement sur CongoServices.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus me-2"></i>Créer mon compte
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+document.addEventListener('keydown', function(event) {
+
+    // CTRL + U
+    if (event.ctrlKey && event.key.toLowerCase() === 'u') {
+        event.preventDefault();
+    }
+
+    // F12
+    if (event.key === 'F12') {
+        event.preventDefault();
+    }
+
+    // CTRL + SHIFT + I
+    if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i') {
+        event.preventDefault();
+    }
+
+});
+</script>
+{% endblock %}

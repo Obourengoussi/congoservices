@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - CongoServices{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container py-4">
+
+        <h2 class="mb-4">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard Administrateur
+        </h2>
+
+        <!-- Statistiques -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0">Utilisateurs</p>
+                                <h2 class="mb-0">{{ stats.total_users }}</h2>
+                            </div>
+                            <i class="bi bi-people fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0">Prestataires</p>
+                                <h2 class="mb-0">{{ stats.total_prestataires }}</h2>
+                            </div>
+                            <i class="bi bi-person-badge fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0">Validés</p>
+                                <h2 class="mb-0">{{ stats.validated_prestataires }}</h2>
+                            </div>
+                            <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0">Vidéos</p>
+                                <h2 class="mb-0">{{ stats.total_videos }}</h2>
+                            </div>
+                            <i class="bi bi-play-circle fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Statistiques détaillées -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart me-2"></i>Statistiques globales
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row text-center">
+
+                            <div class="col-6">
+                                <h3 class="text-primary">{{ stats.total_views }}</h3>
+                                <p class="text-muted mb-0">Vues vidéos</p>
+                            </div>
+
+                            <div class="col-6">
+                                <h3 class="text-danger">{{ stats.total_likes }}</h3>
+                                <p class="text-muted mb-0">Total des likes</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prestataires en attente -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            En attente de validation
+                        </h5>
+
+                        <span class="badge bg-warning">
+                            {{ pending_prestataires|length }}
+                        </span>
+                    </div>
+
+                    <div class="card-body p-0">
+
+                        {% if pending_prestataires %}
+
+                        <div class="list-group list-group-flush">
+
+                            {% for presta in pending_prestataires[:5] %}
+
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <strong>{{ presta.nom | e }}</strong>
+                                    <br>
+
+                                    <small class="text-muted">
+                                        {{ presta.service | e }}
+                                    </small>
+                                </div>
+
+                                <!-- FORMULAIRE SÉCURISÉ -->
+                                <form method="POST"
+                                      action="{{ url_for('admin_validate_prestataire', id=presta.id) }}">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+                                        Valider
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% if pending_prestataires|length > 5 %}
+
+                        <div class="card-body text-center">
+                            <a href="{{ url_for('admin_prestataires', status='pending') }}"
+                               class="btn btn-outline-primary btn-sm">
+
+                                Voir tout ({{ pending_prestataires|length }})
+
+                            </a>
+                        </div>
+
+                        {% endif %}
+
+                        {% else %}
+
+                        <div class="card-body text-center text-muted">
+                            <i class="bi bi-check-all fs-1"></i>
+                            <p class="mb-0">Aucune demande en attente</p>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Navigation rapide -->
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <a href="{{ url_for('admin_prestataires') }}"
+                   class="text-decoration-none">
+
+                    <div class="card border-0 shadow-sm text-center py-4">
+                        <i class="bi bi-people fs-1 text-primary"></i>
+                        <h5 class="mt-2">Gestion prestataires</h5>
+                    </div>
+
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="{{ url_for('admin_users') }}"
+                   class="text-decoration-none">
+
+                    <div class="card border-0 shadow-sm text-center py-4">
+                        <i class="bi bi-person-circle fs-1 text-success"></i>
+                        <h5 class="mt-2">Gestion utilisateurs</h5>
+                    </div>
+
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="{{ url_for('admin_videos') }}"
+                   class="text-decoration-none">
+
+                    <div class="card border-0 shadow-sm text-center py-4">
+                        <i class="bi bi-play-circle fs-1 text-danger"></i>
+                        <h5 class="mt-2">Gestion vidéos</h5>
+                    </div>
+
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Derniers utilisateurs -->
+        <div class="card border-0 shadow-sm mt-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Derniers inscrits
+                </h5>
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Rôle</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for user in recent_users %}
+
+                            <tr>
+
+                                <td>{{ user.email | e }}</td>
+
+                                <td>{{ user.username | e }}</td>
+
+                                <td>
+
+                                    {% if user.role|e == 'admin' %}
+
+                                    <span class="badge bg-danger">
+                                        Admin
+                                    </span>
+
+                                    {% elif user.role|e == 'prestataire' %}
+
+                                    <span class="badge bg-primary">
+                                        Prestataire
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        Utilisateur
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ user.created_at.strftime('%d/%m/%Y') }}
+                                </td>
+
+                                <td>
+
+                                    {% if user.is_active %}
+
+                                    <span class="badge bg-success">
+                                        Actif
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        Inactif
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

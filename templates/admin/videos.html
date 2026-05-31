@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion Vidéos - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+
+    <div class="container py-4">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h2>
+                <i class="bi bi-play-circle me-2"></i>
+                Gestion des vidéos
+            </h2>
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-2"></i>
+                Retour
+
+            </a>
+
+        </div>
+
+        <!-- FILTRES -->
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="btn-group w-100 flex-wrap">
+
+                    <a href="{{ url_for('admin_videos') }}"
+                       class="btn btn-outline-primary {% if not status %}active{% endif %}">
+                        Toutes
+                    </a>
+
+                    <a href="{{ url_for('admin_videos', status='active') }}"
+                       class="btn btn-outline-success {% if status == 'active' %}active{% endif %}">
+                        Actives
+                    </a>
+
+                    <a href="{{ url_for('admin_videos', status='featured') }}"
+                       class="btn btn-outline-warning {% if status == 'featured' %}active{% endif %}">
+                        Vedettes
+                    </a>
+
+                    <a href="{{ url_for('admin_videos', status='sponsored') }}"
+                       class="btn btn-outline-danger {% if status == 'sponsored' %}active{% endif %}">
+                        Sponsorisées
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Catégorie</th>
+                                <th>Auteur</th>
+                                <th>Vues</th>
+                                <th>Likes</th>
+                                <th>Statut</th>
+                                <th width="180">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for video in pagination.items %}
+                            <tr>
+
+                                <!-- TITRE -->
+                                <td>
+
+                                    <strong>
+                                        {{ video.title[:50] | e }}
+                                    </strong>
+
+                                    {% if video.title|length > 50 %}
+                                        ...
+                                    {% endif %}
+
+                                    <br>
+
+                                    <small class="text-muted">
+                                        {{ video.created_at.strftime('%d/%m/%Y') }}
+                                    </small>
+
+                                </td>
+
+                                <!-- CATEGORIE -->
+                                <td>
+                                    {{ video.categorie | e }}
+                                </td>
+
+                                <!-- AUTEUR -->
+                                <td>
+
+                                    {% if video.prestataire %}
+
+                                        <a href="{{ url_for('profil_prestataire',
+                                                            id=video.prestataire.id) }}"
+                                           class="text-decoration-none">
+
+                                            {{ video.prestataire.nom | e }}
+
+                                        </a>
+
+                                    {% else %}
+
+                                        <span class="text-muted">-</span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <!-- VUES -->
+                                <td>
+                                    {{ video.views }}
+                                </td>
+
+                                <!-- LIKES -->
+                                <td>
+                                    {{ video.likes }}
+                                </td>
+
+                                <!-- STATUS -->
+                                <td>
+
+                                    {% if video.is_active %}
+
+                                        <span class="badge bg-success">
+                                            Active
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            Inactive
+                                        </span>
+
+                                    {% endif %}
+
+                                    {% if video.is_featured %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Vedette
+                                        </span>
+
+                                    {% endif %}
+
+                                    {% if video.is_sponsored %}
+
+                                        <span class="badge bg-danger">
+                                            Sponsor
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <!-- ACTIONS -->
+                                <td>
+
+                                    <div class="btn-group btn-group-sm flex-wrap">
+
+                                        <!-- VOIR -->
+                                        <a href="{{ url_for('voir_video', id=video.id) }}"
+                                           class="btn btn-outline-primary"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           title="Voir">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </a>
+
+                                        <!-- FEATURE -->
+                                        <form method="POST"
+                                              action="{{ url_for('admin_toggle_video_featured',
+                                                                 id=video.id) }}"
+                                              class="d-inline">
+
+                                            <input type="hidden"
+                                                   name="csrf_token"
+                                                   value="{{ csrf_token() }}">
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-warning"
+                                                    title="Mettre en vedette"
+                                                    onclick="return confirm('Modifier le statut vedette ?')">
+
+                                                <i class="bi bi-star{% if video.is_featured %}-fill{% endif %}"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                        <!-- SPONSOR -->
+                                        <form method="POST"
+                                              action="{{ url_for('admin_toggle_video_sponsored',
+                                                                 id=video.id) }}"
+                                              class="d-inline">
+
+                                            <input type="hidden"
+                                                   name="csrf_token"
+                                                   value="{{ csrf_token() }}">
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger"
+                                                    title="Sponsoriser"
+                                                    onclick="return confirm('Modifier le statut sponsorisé ?')">
+
+                                                <i class="bi bi-currency-dollar"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                        <!-- DELETE -->
+                                        <form method="POST"
+                                              action="{{ url_for('admin_delete_video',
+                                                                 id=video.id) }}"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Supprimer cette vidéo définitivement ?');">
+
+                                            <input type="hidden"
+                                                   name="csrf_token"
+                                                   value="{{ csrf_token() }}">
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger"
+                                                    title="Supprimer">
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PAGINATION -->
+        {% if pagination.pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center flex-wrap">
+
+                {% if pagination.has_prev %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="{{ url_for('admin_videos',
+                                        page=pagination.prev_num,
+                                        status=status) }}">
+
+                        Précédent
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages() %}
+
+                    {% if page_num %}
+
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+
+                            <a class="page-link"
+                               href="{{ url_for('admin_videos',
+                                                page=page_num,
+                                                status=status) }}">
+
+                                {{ page_num }}
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if pagination.has_next %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="{{ url_for('admin_videos',
+                                        page=pagination.next_num,
+                                        status=status) }}">
+
+                        Suivant
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

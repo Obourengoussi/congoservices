@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion - CongoServices{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-5 col-lg-4">
+
+                <div class="auth-card card border-0 shadow-lg">
+
+                    <div class="card-body p-5">
+
+                        <div class="text-center mb-4">
+
+                            <i class="bi bi-geo-alt-fill display-4 text-primary"></i>
+
+                            <h3 class="mt-3">Connexion</h3>
+
+                            <p class="text-muted">
+                                Connectez-vous à votre compte CongoServices
+                            </p>
+
+                        </div>
+
+                        <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+
+                            <!-- CSRF -->
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <!-- EMAIL -->
+                            <div class="mb-3">
+
+                                <label for="email" class="form-label">
+                                    Email
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+
+                                    <input
+                                        type="email"
+                                        class="form-control"
+                                        id="email"
+                                        name="email"
+                                        placeholder="votre@email.com"
+                                        maxlength="120"
+                                        autocomplete="email"
+                                        spellcheck="false"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="mb-3">
+
+                                <label for="password" class="form-label">
+                                    Mot de passe
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Votre mot de passe"
+                                        minlength="6"
+                                        maxlength="128"
+                                        autocomplete="current-password"
+                                        required>
+
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        type="button"
+                                        id="togglePassword"
+                                        aria-label="Afficher le mot de passe">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- REMEMBER -->
+                            <div class="mb-3 form-check">
+
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    id="remember"
+                                    name="remember">
+
+                                <label class="form-check-label" for="remember">
+                                    Se souvenir de moi
+                                </label>
+
+                            </div>
+
+                            <!-- BUTTON -->
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Se connecter
+
+                            </button>
+
+                        </form>
+
+                        <!-- REGISTER -->
+                        <div class="text-center mt-4">
+
+                            <p class="text-muted">
+                                Pas encore de compte?
+                            </p>
+
+                            <a href="{{ url_for('register') }}"
+                               class="btn btn-outline-primary">
+
+                                Créer un compte
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // SHOW PASSWORD
+    const toggleBtn = document.getElementById('togglePassword');
+
+    if (toggleBtn) {
+
+        toggleBtn.addEventListener('click', function () {
+
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+
+                passwordInput.type = 'text';
+
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+
+            } else {
+
+                passwordInput.type = 'password';
+
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+
+            }
+
+        });
+
+    }
+
+    // DISABLE RIGHT CLICK
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // BLOCK DEVTOOLS
+    document.addEventListener('keydown', function(event) {
+
+        // CTRL + U
+        if (event.ctrlKey && event.key.toLowerCase() === 'u') {
+            event.preventDefault();
+        }
+
+        // CTRL + SHIFT + I
+        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i') {
+            event.preventDefault();
+        }
+
+        // F12
+        if (event.key === 'F12') {
+            event.preventDefault();
+        }
+
+    });
+
+});
+</script>
+{% endblock %}

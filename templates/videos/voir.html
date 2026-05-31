@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ video.title }} - CongoServices
+{% endblock %}
+
+{% block content %}
+<div class="video-watch-page py-4">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- VIDEO PRINCIPALE -->
+            <div class="col-lg-8">
+
+                <!-- PLAYER -->
+                <div class="video-player-card shadow-sm">
+
+                    <div class="video-player-wrapper">
+
+                        <video
+                            id="mainVideo"
+                            controls
+                            autoplay
+                            playsinline
+                            class="main-video"
+                        >
+                            <source
+                                src="{{ url_for('static', filename='uploads/videos/' + video.video_file) }}"
+                                type="video/mp4"
+                            >
+                        </video>
+
+                        {% if video.is_sponsored %}
+                        <span class="badge bg-danger sponsor-badge">
+                            <i class="bi bi-star-fill me-1"></i>
+                            Sponsorisé
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- INFOS VIDEO -->
+                <div class="card border-0 shadow-sm mt-3">
+
+                    <div class="card-body">
+
+                        <h3 class="fw-bold mb-2">
+                            {{ video.title }}
+                        </h3>
+
+                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mb-3">
+
+                            <span>
+                                <i class="bi bi-eye me-1"></i>
+                                {{ video.views or 0 }} vues
+                            </span>
+
+                            <span>
+                                <i class="bi bi-heart-fill me-1 text-danger"></i>
+                                {{ video.likes or 0 }} likes
+                            </span>
+
+                            <span>
+                                <i class="bi bi-share-fill me-1"></i>
+                                {{ video.shares or 0 }} partages
+                            </span>
+
+                        </div>
+
+                        {% if video.description %}
+                        <p class="mb-3">
+                            {{ video.description }}
+                        </p>
+                        {% endif %}
+
+                        <!-- TAGS -->
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+
+                            {% if video.categorie %}
+                            <span class="badge bg-primary">
+                                {{ video.categorie }}
+                            </span>
+                            {% endif %}
+
+                            {% if video.tags %}
+                                {% for tag in video.tags.split(',') %}
+                                <span class="badge bg-light text-dark border">
+                                    #{{ tag.strip() }}
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="row g-2">
+
+                            <!-- LIKE -->
+                            <div class="col-md-4">
+
+                                <button
+                                    class="btn btn-outline-danger w-100"
+                                    id="likeBtn"
+                                    onclick="likeVideo('{{ video.id }}')"
+                                >
+                                    <i class="bi bi-heart-fill me-2"></i>
+
+                                    <span id="likeCount">
+                                        {{ video.likes or 0 }}
+                                    </span>
+
+                                    J'aime
+                                </button>
+
+                            </div>
+
+                            <!-- SHARE -->
+                            <div class="col-md-4">
+
+                                <button
+                                    class="btn btn-outline-primary w-100"
+                                    onclick="shareVideo('{{ video.id }}')"
+                                >
+                                    <i class="bi bi-share-fill me-2"></i>
+                                    Partager
+                                </button>
+
+                            </div>
+
+                            <!-- WHATSAPP -->
+                            <div class="col-md-4">
+
+                                <a
+                                    href="https://wa.me/?text=Découvrez cette vidéo sur CongoServices : {{ request.url }}"
+                                    target="_blank"
+                                    class="btn btn-success w-100"
+                                >
+                                    <i class="bi bi-whatsapp me-2"></i>
+                                    WhatsApp
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- PRESTATAIRE -->
+                {% if video.prestataire %}
+                <div class="card border-0 shadow-sm mt-3">
+
+                    <div class="card-body">
+
+                        <div class="d-flex align-items-center">
+
+                            <!-- PHOTO -->
+                            <div class="me-3">
+
+                                {% if video.prestataire.photo %}
+                                <img
+                                    src="{{ url_for('static', filename='uploads/profiles/' + video.prestataire.photo) }}"
+                                    alt="{{ video.prestataire.nom }}"
+                                    class="rounded-circle prestataire-avatar"
+                                >
+                                {% else %}
+                                <div class="prestataire-placeholder">
+                                    {{ video.prestataire.nom[0] }}
+                                </div>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- INFOS -->
+                            <div class="flex-grow-1">
+
+                                <h5 class="mb-1">
+                                    {{ video.prestataire.get_full_name() }}
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    {{ video.prestataire.service }}
+                                </p>
+
+                            </div>
+
+                            <!-- CONTACT -->
+                            <div>
+
+                                <a
+                                    href="{{ url_for('profil_prestataire', id=video.prestataire.id) }}"
+                                    class="btn btn-outline-primary btn-sm me-2"
+                                >
+                                    Profil
+                                </a>
+
+                                {% if video.prestataire.whatsapp %}
+                                <a
+                                    href="{{ video.prestataire.get_whatsapp_link() }}"
+                                    target="_blank"
+                                    class="btn btn-success btn-sm"
+                                >
+                                    <i class="bi bi-whatsapp me-1"></i>
+                                    Contacter
+                                </a>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-4">
+
+                <div class="sticky-sidebar">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-collection-play me-2"></i>
+                        Vidéos similaires
+                    </h5>
+
+                    {% if similar_videos %}
+
+                        {% for similar in similar_videos %}
+
+                        <a
+                            href="{{ url_for('voir_video', id=similar.id) }}"
+                            class="text-decoration-none"
+                        >
+
+                            <div class="similar-video-card">
+
+                                <!-- THUMB -->
+                                <div class="similar-thumb">
+
+                                    <video muted>
+                                        <source
+                                            src="{{ url_for('static', filename='uploads/videos/' + similar.video_file) }}"
+                                            type="video/mp4"
+                                        >
+                                    </video>
+
+                                    <div class="similar-play">
+                                        <i class="bi bi-play-fill"></i>
+                                    </div>
+
+                                </div>
+
+                                <!-- INFOS -->
+                                <div class="similar-content">
+
+                                    <h6 class="text-dark mb-1">
+                                        {{ similar.title }}
+                                    </h6>
+
+                                    <p class="small text-muted mb-1">
+                                        <i class="bi bi-eye me-1"></i>
+                                        {{ similar.views or 0 }}
+                                        vues
+                                    </p>
+
+                                    <p class="small text-muted mb-0">
+                                        <i class="bi bi-heart-fill me-1 text-danger"></i>
+                                        {{ similar.likes or 0 }}
+                                        likes
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center text-muted">
+                            Aucune vidéo similaire
+                        </div>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function likeVideo(videoId) {
+
+    fetch(`/video/${videoId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.likes !== undefined) {
+
+            document.getElementById('likeCount').textContent = data.likes;
+
+            const btn = document.getElementById('likeBtn');
+
+            btn.classList.remove('btn-outline-danger');
+
+            btn.classList.add('btn-danger');
+        }
+
+    })
+
+    .catch(error => {
+        console.error(error);
+    });
+
+}
+
+function shareVideo(videoId) {
+
+    fetch(`/video/${videoId}/share`, {
+        method: 'POST'
+    });
+
+    window.open(
+        `https://wa.me/?text=Découvrez cette vidéo sur CongoServices : ${window.location.href}`,
+        '_blank'
+    );
+
+}
+
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.video-player-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+}
+
+.video-player-wrapper {
+    position: relative;
+    width: 100%;
+    background: #000;
+}
+
+.main-video {
+    width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    background: #000;
+}
+
+.sponsor-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.8rem;
+}
+
+.prestataire-avatar {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+}
+
+.prestataire-placeholder {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 50%;
+
+    background: var(--bs-primary);
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.sticky-sidebar {
+    position: sticky;
+    top: 90px;
+}
+
+.similar-video-card {
+    display: flex;
+    gap: 12px;
+
+    background: white;
+    border-radius: 14px;
+
+    padding: 10px;
+
+    margin-bottom: 12px;
+
+    transition: 0.3s ease;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.similar-video-card:hover {
+    transform: translateY(-3px);
+}
+
+.similar-thumb {
+    position: relative;
+
+    width: 95px;
+    height: 140px;
+
+    border-radius: 10px;
+    overflow: hidden;
+
+    flex-shrink: 0;
+
+    background: #000;
+}
+
+.similar-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.similar-play {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: white;
+    font-size: 2rem;
+
+    opacity: 0.9;
+}
+
+.similar-content {
+    flex-grow: 1;
+}
+
+.similar-content h6 {
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    display: block;
+    line-height: 1.4em;
+    max-height: 2.8em;
+}
+
+@media (max-width: 991px) {
+
+    .sticky-sidebar {
+        position: relative;
+        top: auto;
+    }
+
+}
+
+</style>
+{% endblock %}

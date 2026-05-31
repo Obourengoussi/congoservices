@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}
+Page non trouvée - CongoServices
+{% endblock %}
+
+{% block content %}
+<div class="error-page">
+
+    <div class="container">
+
+        <div class="error-box shadow-sm">
+
+            <!-- ICON -->
+            <div class="error-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+
+            <!-- CODE -->
+            <h1 class="error-code">
+                404
+            </h1>
+
+            <!-- TITLE -->
+            <h2 class="fw-bold mb-3">
+                Page non trouvée
+            </h2>
+
+            <!-- MESSAGE -->
+            <p class="text-muted mb-4">
+                La page que vous recherchez n'existe pas,
+                a été déplacée ou supprimée.
+            </p>
+
+            <!-- BUTTONS -->
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+
+                <a
+                    href="{{ url_for('index') }}"
+                    class="btn btn-primary btn-lg"
+                >
+                    <i class="bi bi-house-fill me-2"></i>
+                    Retour à l'accueil
+                </a>
+
+                <button
+                    onclick="history.back()"
+                    class="btn btn-outline-secondary btn-lg"
+                >
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Retour
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.error-page {
+    min-height: calc(100vh - 180px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8f9fa 0%,
+            #eef2f7 100%
+        );
+
+    padding: 40px 15px;
+}
+
+.error-box {
+    max-width: 600px;
+
+    margin: auto;
+
+    background: white;
+
+    border-radius: 22px;
+
+    padding: 50px 35px;
+
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 5rem;
+    color: #f59e0b;
+
+    margin-bottom: 10px;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 800;
+
+    color: var(--bs-primary);
+
+    margin-bottom: 10px;
+}
+
+.error-box p {
+    font-size: 1.05rem;
+}
+
+@media (max-width: 576px) {
+
+    .error-box {
+        padding: 35px 20px;
+    }
+
+    .error-code {
+        font-size: 4.5rem;
+    }
+
+    .error-icon {
+        font-size: 4rem;
+    }
+
+}
+
+</style>
+{% endblock %}
