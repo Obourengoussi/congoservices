@@ -1,28 +1,18 @@
-# CongoServices - Requirements.txt
-# Plateforme de mise en relation de services locaux au Congo Brazzaville
-
-# Framework web
 Flask==3.0.2
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Flask-WTF==1.2.1
 Flask-Migrate==4.0.5
 
-# Base de données
 SQLAlchemy==2.0.23
 Werkzeug==3.0.1
 
-# Validations et formulaires
 WTForms==3.1.1
 email-validator==2.1.0
 
-# Utilitaires
 python-dotenv==1.0.0
-Pillow==10.4.0  # Pour le traitement d'images
-gunicorn==21.2.0  # Serveur de production
+Pillow==10.4.0
 
-# Gestion des fichiers
-python-magic==0.4.27  # Détection du type de fichier
-
-# Security
-bcrypt==4.1.1  # Hachage des mots de passe
+gunicorn==21.2.0
+python-magic==0.4.27
+bcrypt==4.1.1
