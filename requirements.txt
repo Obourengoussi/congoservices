@@ -18,7 +18,7 @@ email-validator==2.1.0
 
 # Utilitaires
 python-dotenv==1.0.0
-Pillow==10.1.0  # Pour le traitement d'images
+Pillow==10.4.0  # Pour le traitement d'images
 gunicorn==21.2.0  # Serveur de production
 
 # Gestion des fichiers
