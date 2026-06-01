@@ -10,9 +10,6 @@ from datetime import datetime, timedelta
 from config import Config
 from models import db, User, Prestataire, Video, Comment, Payment, Contact, VideoLike
 import os
-def init_db():
-    if os.environ.get("RENDER"):
-        return
 import uuid
 
 # ============================================
@@ -30,6 +27,26 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+    # Création automatique du compte admin
+    admin = User.query.filter_by(
+        email='admin@congobrazza.cg'
+    ).first()
+
+    if not admin:
+        admin = User(
+            email='admin@congobrazza.cg',
+            username='admin',
+            role='admin',
+            is_active=True
+        )
+
+        admin.set_password('admin123')
+
+        db.session.add(admin)
+        db.session.commit()
+
+        print("✓ ADMIN CRÉÉ")
 
 # Login manager
 login_manager = LoginManager()
@@ -180,12 +197,19 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
+        # DEBUG
+        if user:
+            print("EMAIL =", user.email)
+            print("ROLE =", user.role)
+
         if user and user.check_password(password):
+
             if not user.is_active:
                 flash('Compte désactivé.', 'error')
                 return render_template('login.html')
 
             login_user(user)
+
             user.last_login = datetime.utcnow()
             db.session.commit()
 
@@ -195,7 +219,6 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -204,6 +227,15 @@ def logout():
     flash('Vous avez été déconnecté.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/test-admin')
+@login_required
+def test_admin():
+    return f"""
+    User: {current_user.username}<br>
+    Email: {current_user.email}<br>
+    Role: {current_user.role}<br>
+    Is Admin: {current_user.is_admin()}
+    """
 
 # ============================================
 # ROUTES - PRESTATAIRES
@@ -520,7 +552,10 @@ def prestatione_dashboard():
 
 
 def admin_required():
-    if not current_user.is_authenticated or not current_user.is_admin():
+    if not current_user.is_authenticated:
+        abort(403)
+
+    if current_user.role != "admin":
         abort(403)
 
 # ============================================
